@@ -1,19 +1,25 @@
-"""Fault diagnosis panel displaying detected faults in plain Chinese."""
+"""Fault diagnosis panel — compact, scannable, no fluff."""
 
 import streamlit as st
 from anaerobic_reactor_agent.models.diagnosis import DiagnosisResult, FaultSeverity
 
 
 SEVERITY_LABELS = {
-    FaultSeverity.WARNING: "注意预警",
-    FaultSeverity.ALARM: "异常报警",
-    FaultSeverity.CRITICAL: "严重危急",
+    FaultSeverity.WARNING: "预警",
+    FaultSeverity.ALARM: "报警",
+    FaultSeverity.CRITICAL: "危急",
 }
 
 SEVERITY_EMOJI = {
     FaultSeverity.WARNING: "🟡",
     FaultSeverity.ALARM: "🔴",
     FaultSeverity.CRITICAL: "⛔",
+}
+
+SEVERITY_BG = {
+    FaultSeverity.WARNING: "#fef3c7",
+    FaultSeverity.ALARM: "#fee2e2",
+    FaultSeverity.CRITICAL: "#fecaca",
 }
 
 FAULT_TYPE_NAMES = {
@@ -28,116 +34,84 @@ FAULT_TYPE_NAMES = {
     "calcium_precipitation": "钙盐沉积",
 }
 
-# Human-readable rule name mapping (code → plain Chinese)
-RULE_NAME_CN = {
-    "acidification_classic": "典型酸化模式（VFA高+pH低+VFA/碱度比超标）",
-    "acidification_early_warning": "酸化早期预警（VFA上升+VFA/碱度比偏高，pH尚正常）",
-    "ammonia_inhibition": "氨氮抑制模式（NH₃-N高+甲烷含量低+pH偏高）",
-    "temperature_shock": "温度冲击模式（温度偏离中温范围+产气量下降）",
-    "organic_overload": "有机负荷过高模式（OLR超限+COD去除率下降+VFA上升）",
-    "sludge_washout": "污泥流失模式（HRT过短+COD去除率下降）",
-    "toxic_inhibition": "毒性抑制模式（产气量骤降+甲烷含量低+pH下降）",
-    "sulfide_inhibition": "硫化物抑制模式（甲烷低+产气少+pH偏低）",
-    "nutrient_deficiency": "营养缺乏模式（COD去除率低+VFA上升+产气不足）",
-    "calcium_precipitation": "钙沉积模式（碱度高+COD去除率低+pH偏高）",
-}
-
 LEVEL_COLORS = {"immediate": "#ef4444", "long_term": "#f59e0b", "preventive": "#3b82f6"}
-LEVEL_NAMES = {"immediate": "紧急处理", "long_term": "长期措施", "preventive": "预防建议"}
+LEVEL_BADGES = {"immediate": "紧急", "long_term": "长期", "preventive": "预防"}
 
-# Parameter name mapping for evidence messages
 PARAM_CN = {
-    "ph": "pH值", "vfa": "挥发性脂肪酸(VFA)", "alkalinity": "碱度",
-    "temperature": "温度", "orp": "氧化还原电位(ORP)",
-    "biogas_production": "沼气产量", "methane_content": "甲烷含量",
-    "olr": "有机负荷(OLR)", "hrt": "水力停留时间(HRT)",
-    "nh3_n": "氨氮(NH₃-N)", "cod_removal_rate": "COD去除率",
-    "vfa_alkalinity_ratio": "VFA/碱度比值",
+    "ph": "pH", "vfa": "VFA", "alkalinity": "碱度",
+    "temperature": "温度", "orp": "ORP",
+    "biogas_production": "产气量", "methane_content": "甲烷含量",
+    "olr": "OLR", "hrt": "HRT",
+    "nh3_n": "氨氮", "cod_removal_rate": "COD去除率",
+    "vfa_alkalinity_ratio": "VFA/碱度比",
 }
 
 
 def render_diagnosis_panel(result: DiagnosisResult):
-    """以通俗中文展示故障诊断结果。"""
+    """紧凑、言简意赅的故障诊断展示。"""
 
     if not result.faults:
-        st.success("未检测到故障，反应器运行状态良好。")
+        st.success("✅ 未检测到故障，反应器运行状态良好。")
         return
 
-    st.subheader(f"故障诊断（共发现 {len(result.faults)} 个问题）")
+    st.subheader(f"🔍 故障诊断（{len(result.faults)} 项）")
 
     for fault in result.faults:
-        emoji = SEVERITY_EMOJI.get(fault.severity, "⚪")
-        label = SEVERITY_LABELS.get(fault.severity, "未知")
+        emoji = SEVERITY_EMOJI.get(fault.severity, "")
+        label = SEVERITY_LABELS.get(fault.severity, "")
         cn_name = FAULT_TYPE_NAMES.get(fault.fault_type, fault.fault_type)
-
-        # Default to expanded for ALARM and CRITICAL
+        bg = SEVERITY_BG.get(fault.severity, "#f8f8f8")
         expanded = fault.severity in (FaultSeverity.ALARM, FaultSeverity.CRITICAL)
 
-        with st.expander(
-            f"{emoji} {cn_name} — {label}（可信度 {fault.confidence:.0%}）",
-            expanded=expanded,
-        ):
-            # ---- 问题说明 ----
-            st.markdown("### 这是什么问题？")
-            st.write(fault.description)
+        # ---- Compact title line ----
+        title = f"{emoji} **{cn_name}** | {label} | 可信度 {fault.confidence:.0%}"
+        if fault.severity == FaultSeverity.ALARM:
+            title = f"{emoji} ⚠️ **{cn_name}** | {label} | 可信度 {fault.confidence:.0%}"
+        elif fault.severity == FaultSeverity.CRITICAL:
+            title = f"{emoji} 🚨 **{cn_name}** | {label} | 可信度 {fault.confidence:.0%}"
 
-            # ---- 为什么发生 ----
+        with st.expander(title, expanded=expanded):
+            # ---- One-line summary + cause (merged, concise) ----
+            st.markdown(f"**问题：**{fault.description}")
+
             if fault.causal_chain:
-                st.markdown("### 为什么会发生？（因果链）")
-                # Split causal chain into steps for readability
-                steps = [s.strip() for s in fault.causal_chain.replace("→", "→").split("→")]
-                chain_text = "  →  ".join(steps)
-                st.info(chain_text)
+                # Condense causal chain to one compact line
+                chain = fault.causal_chain.replace(" → ", " → ")
+                st.caption(f"▸ 因果链：{chain}")
 
-            # ---- 判断依据 ----
-            st.markdown("### 判断依据（系统是如何发现这个问题的）")
-            # Show matched rules in plain Chinese
-            with st.container(border=True):
-                for r in fault.matched_rules:
-                    cn_desc = RULE_NAME_CN.get(r, r)
-                    st.caption(f"触发规则：{cn_desc}")
-
-            # ---- 数据证据 ----
+            # ---- Key evidence inline ----
             if fault.evidence:
-                st.markdown("### 哪些数据出现了异常？")
-                # Filter and rewrite evidence into plain language
-                seen_params = set()
-                for e in fault.evidence:
-                    # Parse evidence (format: "param_name=value unit, message")
+                params_str = []
+                for e in fault.evidence[:5]:  # max 5 items
                     for code, cn in PARAM_CN.items():
                         if e.startswith(code + "="):
-                            if code not in seen_params:
-                                seen_params.add(code)
-                                # Extract the message part after the comma
-                                parts = e.split(",", 1)
-                                if len(parts) == 2:
-                                    value_part = parts[0].replace(code + "=", "")
-                                    st.markdown(
-                                        f"- **{cn}**：当前值 `{value_part}`，{parts[1]}"
-                                    )
-                                else:
-                                    st.markdown(f"- **{cn}**：{e}")
+                            val = e.split(",")[0].replace(code + "=", "")
+                            params_str.append(f"**{cn}**={val}")
                             break
-                    else:
-                        st.markdown(f"- {e}")
+                if params_str:
+                    st.caption(f"▸ 异常参数：{'，'.join(params_str)}")
 
-            # ---- 置信度 ----
-            confidence_pct = fault.confidence * 100
-            if confidence_pct >= 80:
-                conf_label = "高度可信 —— 多个指标同时指向此问题"
-            elif confidence_pct >= 50:
-                conf_label = "较可信 —— 主要指标符合，建议进一步确认"
-            else:
-                conf_label = "需关注 —— 部分指标异常，建议持续观察"
-            st.progress(fault.confidence, text=f"可信度：{confidence_pct:.0f}%（{conf_label}）")
+            # ---- Confidence bar compact ----
+            st.progress(fault.confidence)
 
-            # ---- 处理建议 ----
+            # ---- Recommendations: immediate first, rest folded ----
             if fault.recommendations:
-                st.markdown("### 针对此问题的处理建议")
-                for i, rec in enumerate(fault.recommendations, 1):
-                    color = LEVEL_COLORS.get(rec.level, "#888")
-                    level_name = LEVEL_NAMES.get(rec.level, rec.level)
-                    st.markdown(
-                        f"{i}. <span style='color:{color};font-weight:bold'>[{level_name}]</span> {rec.text}",
-                        unsafe_allow_html=True,
-                    )
+                immediate = [r for r in fault.recommendations if r.level == "immediate"]
+                rest = [r for r in fault.recommendations if r.level != "immediate"]
+
+                if immediate:
+                    st.markdown("**立即执行：**")
+                    for r in immediate:
+                        st.markdown(
+                            f"- 🔴 {r.text}"
+                        )
+
+                if rest:
+                    with st.expander(f"查看其他建议（{len(rest)} 条）", expanded=False):
+                        for r in rest:
+                            color = LEVEL_COLORS.get(r.level, "#888")
+                            badge = LEVEL_BADGES.get(r.level, r.level)
+                            st.markdown(
+                                f"- <span style='color:{color}'>[{badge}]</span> {r.text}",
+                                unsafe_allow_html=True,
+                            )

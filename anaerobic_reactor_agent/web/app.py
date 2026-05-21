@@ -1,4 +1,4 @@
-"""Streamlit web application entry point."""
+"""厌氧反应器智能诊断系统 — Web 入口."""
 
 import streamlit as st
 
@@ -10,8 +10,7 @@ st.set_page_config(
 )
 
 from anaerobic_reactor_agent.web.session_state import init_session_state
-from anaerobic_reactor_agent.web.pages.dashboard import render_dashboard
-from anaerobic_reactor_agent.web.pages.history import render_history
+from anaerobic_reactor_agent.web.views.dashboard import render_dashboard
 from anaerobic_reactor_agent.web.components.sidebar import render_sidebar
 
 
@@ -19,16 +18,9 @@ def main():
     init_session_state()
     render_sidebar()
 
-    st.title("厌氧反应器智能诊断系统")
-    st.caption("实时监测 · 故障诊断 · 操作建议")
-
-    tab1, tab2 = st.tabs(["诊断面板", "历史趋势"])
-
-    with tab1:
-        render_dashboard()
-
-    with tab2:
-        render_history()
+    st.title("🧪 厌氧反应器智能诊断系统")
+    st.caption("参数监测 · 故障诊断 · 操作建议 · AI 专家分析")
+    render_dashboard()
 
 
 if __name__ == "__main__":

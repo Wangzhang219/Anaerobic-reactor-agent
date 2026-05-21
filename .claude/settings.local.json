@@ -31,7 +31,14 @@
       "Bash(git commit *)",
       "Bash(git push *)",
       "Bash(git branch *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill -PID 24444 -F)",
+      "Bash(streamlit run *)",
+      "Bash(sleep 5 && cat /c/Users/lenovo/AppData/Local/Temp/claude/c--Users-lenovo-Desktop------/3b53cbdd-d04b-4588-bad1-2ef51fc724f4/tasks/bru523nic.output 2>/dev/null | tail -20)",
+      "Read(//c/Users/lenovo/AppData/Local/Temp/claude/c--Users-lenovo-Desktop------/3b53cbdd-d04b-4588-bad1-2ef51fc724f4/tasks/**)",
+      "Bash(awk '{print $NF}')",
+      "Bash(xargs -r taskkill -F -PID)"
     ]
   }
 }
