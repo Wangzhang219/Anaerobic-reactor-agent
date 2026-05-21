@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(pip show *)",
+      "Bash(\"C:\\\\Users\\\\lenovo\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\" -m pytest tests/ -v)",
+      "Bash(\"C:\\\\Users\\\\lenovo\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\" -m anaerobic_reactor_agent check --ph 6.2 --temperature 35 --cod-inlet 5000 --cod-outlet 2500 --vfa 800 --alkalinity 1500 --orp -250 --biogas 30 --methane 55 --olr 8 --hrt 12 --nh3-n 50)",
+      "Bash(\"C:\\\\Users\\\\lenovo\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\" -c \"from anaerobic_reactor_agent.main import main; import sys; sys.argv = ['check', '--ph', '6.2', '--temperature', '35', '--cod-inlet', '5000', '--cod-outlet', '2500', '--vfa', '800', '--alkalinity', '1500', '--orp', '-250', '--biogas', '30', '--methane', '55', '--olr', '8', '--hrt', '12']; main\\(\\)\")",
+      "Bash(python -c \"from anaerobic_reactor_agent.engine.rule_engine import RuleEngine; from anaerobic_reactor_agent.models.reactor_state import ReactorParameters; p = ReactorParameters\\(ph=6.2, temperature=35, cod_inlet=5000, cod_outlet=2500, vfa=800, alkalinity=1500, orp=-250, biogas_production=30, methane_content=55, olr=8, hrt=12\\); r = RuleEngine\\(\\).diagnose\\(p\\); print\\(f'状态: {r.overall_status.value}, 故障数: {r.fault_count}'\\); [print\\(f'  - {f.fault_type} \\(置信度{f.confidence:.0%}\\)'\\) for f in r.faults]\")",
+      "Bash(pip --version)",
+      "Bash(python -m pip install pyyaml pydantic python-dotenv click rich)",
+      "Bash(python -m pip install -e . --no-deps)",
+      "Bash(python demo.py)",
+      "Bash(python -m pip install streamlit plotly)",
+      "Bash(python -m streamlit run anaerobic_reactor_agent/web/app.py --server.port 8501)",
+      "Bash(python -m streamlit run anaerobic_reactor_agent/web/app.py --server.port 8501 --server.headless true --browser.gatherUsageStats false)",
+      "Bash(taskkill //F //IM python.exe)",
+      "Bash(curl -s -o NUL -w \"%{http_code}\" http://localhost:8501)",
+      "Bash(python -c \"import openai; print\\(f'openai {openai.__version__}'\\); import anthropic; print\\(f'anthropic {anthropic.__version__}'\\)\")",
+      "Bash(python -m pip install openai google-generativeai -q)",
+      "Bash(python -c \"import openai; print\\('openai OK'\\)\")",
+      "Bash(python -c \"import google.generativeai; print\\('gemini OK'\\)\")",
+      "Bash(python -m pytest tests/ -q)",
+      "Bash(python -c \"import openai; print\\('openai OK, version:', openai.__version__\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(ssh -T git@github.com)",
+      "Bash(gh repo *)",
+      "Bash(git remote *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  }
+}

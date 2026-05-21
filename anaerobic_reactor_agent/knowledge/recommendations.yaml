@@ -1,0 +1,506 @@
+# ===========================================================================
+# 厌氧反应器操作建议知识库
+# 按故障类型 + 严重程度 + 反应器类型 三维组织
+# ===========================================================================
+
+general:
+  normal:
+    - text: "反应器各项指标在正常范围内，系统运行稳定"
+      level: preventive
+    - text: "保持日常监测频率：pH、VFA、碱度每8小时一次；COD、产气量每24小时一次"
+      level: preventive
+    - text: "记录运行数据，建立趋势基线，便于及早发现异常"
+      level: preventive
+    - text: "定期检查在线传感器校准状态，防止测量偏差误导判断"
+      level: preventive
+
+  warning:
+    - text: "反应器出现预警信号，将监测频率加密至每2-4小时一次"
+      level: immediate
+    - text: "立即通知运行主管，启动应急响应预备方案"
+      level: immediate
+    - text: "准备碱度补充剂(NaHCO₃/Na₂CO₃)和活性炭等应急物资"
+      level: long_term
+    - text: "在故障排除前，暂停任何计划内的负荷提升或工艺调整"
+      level: immediate
+
+  alarm:
+    - text: "反应器处于报警状态，立即启动应急响应流程"
+      level: immediate
+    - text: "通知运行团队全体成员，切换为连续监测或每小时人工采样"
+      level: immediate
+    - text: "详细记录所有观察数据、干预措施及时间点，形成事故报告"
+      level: immediate
+    - text: "评估是否需要暂时停进料或切换至旁路/调节池"
+      level: immediate
+
+# ===========================================================================
+# 故障专项建议 — 按故障类型组织
+# 每类含：故障机理说明 + 紧急处理 + 长期恢复 + 预防措施 + 分反应器建议
+# ===========================================================================
+fault_specific:
+
+  # ==========================================================================
+  # 1. 酸化 (Acidification)
+  # ==========================================================================
+  acidification:
+    detail: "酸化是厌氧反应器最常见的故障模式。产酸菌活性超过产甲烷菌，导致VFA积累和pH下降。若不及时干预，会形成'VFA积累→pH下降→产甲烷菌受抑制→更多VFA积累'的正反馈回路，最终导致反应器'酸化崩溃'。恢复时间：轻度酸化1-3天，中度3-7天，重度可能需要2-4周。"
+
+    # --- 紧急处理 (0-24h) ---
+    immediate:
+      - text: "立即降低有机负荷30%-50%：减少进料量或降低进水COD浓度，切断产酸底物来源"
+        level: immediate
+      - text: "若pH已低于6.3，立即投加缓冲剂：NaHCO₃按0.5-1.0 g/g-VFA投加，Na₂CO₃按0.3-0.6 g/g-VFA投加；分3-4次加入，间隔2小时，避免pH剧烈波动"
+        level: immediate
+      - text: "增加回流比至200%-300%（若反应器有回流系统），利用出水碱度稀释反应器内VFA浓度"
+        level: immediate
+      - text: "若VFA/碱度比 > 0.8，考虑暂时停进料2-4小时，仅维持回流循环"
+        level: immediate
+      - text: "立即取样检测VFA组分（乙酸、丙酸、丁酸），丙酸/乙酸比 > 1.4 时说明产氢产乙酸菌也受抑制，恢复难度更大"
+        level: immediate
+      - text: "加密监测：pH每30分钟、VFA每2小时、碱度每2小时、产气量每1小时"
+        level: immediate
+
+    # --- 长期恢复 (1-7天) ---
+    long_term:
+      - text: "待VFA降至300 mg/L以下、VFA/碱度比 < 0.3 后，以每次不超过10%的幅度逐步恢复进料负荷，每次提升后稳定运行至少24小时观察响应"
+        level: long_term
+      - text: "恢复期间持续监测VFA变化趋势（上升/下降速率），趋势比绝对值更灵敏"
+        level: long_term
+      - text: "检查并优化搅拌/混合系统，确保碱度与酸性物质充分接触反应"
+        level: long_term
+      - text: "评估是否需要接种新鲜厌氧污泥（产甲烷菌补充），通常按现有污泥量的5%-10%投加"
+        level: long_term
+      - text: "分析进水成分变化历史，排查是否含有大量易降解有机物（如糖类、有机酸），此类物质产酸速率极快"
+        level: long_term
+      - text: "若反应器为CSTR类型，检查是否有短流或死角导致局部VFA积累"
+        level: long_term
+
+    # --- 预防措施 ---
+    preventive:
+      - text: "维持进水碱度：COD:碱度比控制在1:0.2-0.4（即每去除1g COD需0.2-0.4g CaCO₃碱度），工业废水应偏上限"
+        level: preventive
+      - text: "安装在线VFA/pH监测探头，设置预警阈值（VFA>300 mg/L或pH<6.8自动报警）"
+        level: preventive
+      - text: "建立VFA/碱度比趋势跟踪图，每周至少分析一次；比值连续上升趋势时提前预警"
+        level: preventive
+      - text: "避免有机负荷突然增加超过20%；任何负荷调整后前48小时加密监测"
+        level: preventive
+      - text: "定期排泥保持合理的SRT（污泥停留时间），过长SRT（>60天）可能导致产甲烷菌老化"
+        level: preventive
+      - text: "建立进料COD波动预警机制，进水COD日变化超过±30%时自动触发加密监测"
+        level: preventive
+
+    # --- 分反应器类型 ---
+    by_reactor_type:
+      UASB:
+        - text: "UASB酸化时检查颗粒污泥沉降性，酸化可能导致颗粒解体上浮"
+          level: immediate
+        - text: "降低上升流速至0.3-0.5 m/h，减少对颗粒污泥的剪切"
+          level: immediate
+      CSTR:
+        - text: "CSTR酸化时提高搅拌强度(50-100 rpm)加速碱度扩散和VFA稀释"
+          level: immediate
+        - text: "CSTR无污泥截留机制，酸化恢复期可能更长，需更保守地恢复负荷"
+          level: long_term
+      EGSB:
+        - text: "EGSB酸化时降低上升流速，避免颗粒污泥床膨胀过度导致污泥流失"
+          level: immediate
+      IC:
+        - text: "IC反应器检查内循环是否正常，酸化可能导致内循环气提动力不足"
+          level: immediate
+      AnMBR:
+        - text: "AnMBR注意膜污染可能在酸化期间加剧，适当降低膜通量10%-20%"
+          level: immediate
+
+  # ==========================================================================
+  # 2. 氨抑制 (Ammonia Inhibition)
+  # ==========================================================================
+  ammonia_inhibition:
+    detail: "游离氨(NH₃)对产甲烷菌具有毒性，浓度超过150 mg/L时抑制显著，超过300 mg/L可严重抑制。游离氨比例随pH和温度升高而增加：pH每升高0.1，NH₃比例约增加10%。在高蛋白废水处理中尤为常见。"
+
+    immediate:
+      - text: "立即降低高蛋白/高氮进料比例50%以上，或切换至低氮备用水源"
+        level: immediate
+      - text: "降低运行温度1-2°C（在产甲烷菌耐受范围内），以减少游离氨比例——30°C时NH₃比例约为35°C时的70%"
+        level: immediate
+      - text: "若pH>7.8，通过降低进水碱度或微量酸性进水（慎重！）将pH控制在7.2-7.5范围，减少NH₃生成"
+        level: immediate
+      - text: "稀释进水至NH₃-N < 100 mg/L（需要氨氮去除50%以上的稀释比）"
+        level: immediate
+      - text: "考虑添加易降解碳源（葡萄糖、甲醇等）提高C/N比至20:1以上，促进微生物同化氨氮"
+        level: immediate
+      - text: "取样检测总氨氮(TAN)和pH、温度，计算实际游离氨浓度：NH₃ = TAN × (1 + 10^(pKa-pH))⁻¹，pKa = 0.09018 + 2729.92/(T+273.15)"
+        level: immediate
+
+    long_term:
+      - text: "氨抑制恢复通常需要1-2个SRT周期（15-30天），产甲烷菌群落重建需要时间"
+        level: long_term
+      - text: "逐步恢复高蛋白进料，以每次5%-10%的幅度增加，每次调整后稳定3-5天观察"
+        level: long_term
+      - text: "投加沸石（天然斜发沸石）50-100 g/L，利用离子交换吸附NH₄⁺，沸石可回收再生"
+        level: long_term
+      - text: "评估是否需要增设预处理：氨吹脱（pH>10, 曝气）、鸟粪石沉淀(Mg:NH₄:PO₄=1:1:1)、ANAMMOX等"
+        level: long_term
+      - text: "分析进料氨基酸组成和蛋白质含量，建立氮负荷台账"
+        level: long_term
+
+    preventive:
+      - text: "维持C/N比在20-30:1范围（以COD/N计），氮过高时配加碳源"
+        level: preventive
+      - text: "氨氮水平>100 mg/L时将运行pH控制在7.2-7.5（低于常规值），减少游离氨"
+        level: preventive
+      - text: "对高氮废水（养殖、屠宰、食品加工）建立预处理工序或氨氮在线监测"
+        level: preventive
+      - text: "定期（每周）检测进料和反应器内TAN，跟踪变化趋势"
+        level: preventive
+      - text: "冬季温度低时氨抑制风险相对较低，但夏季温度升高应提前关注"
+        level: preventive
+
+    by_reactor_type:
+      CSTR:
+        - text: "CSTR完全混合特性有利于稀释氨氮浓度，但停留时间分布也可能导致部分区域浓度不均"
+          level: long_term
+      UASB:
+        - text: "UASB的污泥床底部氨氮浓度可能高于出水，采样时应分层取样确认"
+          level: immediate
+      IC:
+        - text: "IC反应器内循环有助于稀释氨氮，但若内循环失效则上层可能积累"
+          level: immediate
+
+  # ==========================================================================
+  # 3. 温度冲击 (Temperature Shock)
+  # ==========================================================================
+  temperature_shock:
+    detail: "产甲烷菌对温度变化极其敏感。中温产甲烷菌在35-37°C活性最高，日变化超过2°C即可影响产甲烷活性。温度突降至25°C以下时，产甲烷活性可下降50%以上。高温(>45°C)可导致蛋白质变性和不可逆损伤。"
+
+    immediate:
+      - text: "低温冲击：逐步升温，速率不超过2°C/天；过快回温可能导致热休克叠加——微生物膜流动性从'冻结'状态突然转为'过热'状态"
+        level: immediate
+      - text: "高温冲击(>45°C)：立即降温，速率可稍快(3-5°C/h)但不超过5°C/h，防止温度剧烈波动"
+        level: immediate
+      - text: "温度恢复期间将OLR降至正常值的50%，减轻产甲烷菌代谢负担"
+        level: immediate
+      - text: "检查加热/冷却系统是否故障，排查热源（锅炉、换热器、蒸汽管路）"
+        level: immediate
+      - text: "若温度偏差超过±5°C，每小时监测一次沼气产量和甲烷含量，跟踪恢复趋势"
+        level: immediate
+      - text: "检测出水VFA，温度冲击后6-12小时可能出现VFA积累的延迟信号"
+        level: immediate
+
+    long_term:
+      - text: "温度恢复正常后，维持降低的OLR 1-2天，待产气量和COD去除率恢复后再逐步提升"
+        level: long_term
+      - text: "温度冲击后产甲烷菌群落结构可能改变——高温冲击下嗜氢产甲烷菌相对耐受，乙酸营养型产甲烷菌更敏感"
+        level: long_term
+      - text: "评估是否需要投加微量元素支持酶系统修复"
+        level: long_term
+      - text: "使用DGGE/高通量测序评估产甲烷古菌群落恢复情况（可选，大型反应器建议做）"
+        level: long_term
+
+    preventive:
+      - text: "安装温度自动控制系统（PID控制），加热/冷却冗余设计，温差精度控制在±1°C以内"
+        level: preventive
+      - text: "反应器外壁安装保温层（岩棉/PU），减少环境温度影响和热损失"
+        level: preventive
+      - text: "寒冷季节预热进水至反应器温度±2°C范围内，避免冷水直接冲击"
+        level: preventive
+      - text: "设置温度异常报警（偏离设定值±3°C自动触发），连接运行人员手机/邮件通知"
+        level: preventive
+      - text: "季节性温度变化（春季/秋季）期间加密监测，制定温度转换预案"
+        level: preventive
+      - text: "考虑在反应器进水管路安装热交换器，利用出水余热预热进水（节能+温度稳定）"
+        level: preventive
+
+    by_reactor_type:
+      CSTR:
+        - text: "CSTR体积大、热惯性大，温度变化相对缓慢但也更难快速纠正，应更提前预警"
+          level: long_term
+      UASB:
+        - text: "UASB进水分布器可能造成局部温度不均，检查布水均匀性"
+          level: immediate
+      AnMBR:
+        - text: "AnMBR膜系统通常在恒温环境下运行，温度波动可能来自膜清洗液"
+          level: immediate
+
+  # ==========================================================================
+  # 4. 有机负荷过高 (Organic Overload)
+  # ==========================================================================
+  organic_overload:
+    detail: "OLR超过反应器产甲烷能力时，产酸菌快速响应（倍增时间数小时），产甲烷菌响应滞后（倍增时间数天至数周），导致VFA暂时性积累。超负荷程度决定了后果：轻度超载（10%-30%）可能仅需减负即可恢复，重度超载（>50%）可能引发酸化。"
+
+    immediate:
+      - text: "立即将OLR降至设计值或当前去除率对应的安全负荷（通常需要降低30%-50%）"
+        level: immediate
+      - text: "检查进水COD浓度和流量是否异常，排查上游生产工序是否有意外排放"
+        level: immediate
+      - text: "若COD去除率已降至60%以下，考虑暂时停进料2-4小时进行'缓冲恢复'"
+        level: immediate
+      - text: "增加碱度补充，按每克COD额外投加0.1-0.2g CaCO₃碱度，预防VFA积累导致pH下降"
+        level: immediate
+      - text: "未来6-12小时每2小时监测VFA，判断是在上升（恶化）还是下降（好转）"
+        level: immediate
+
+    long_term:
+      - text: "分析反应器实际生物质浓度(g-VSS/L)和比产甲烷活性(g-COD-CH₄/g-VSS·d)，计算实际可承受OLR上限"
+        level: long_term
+      - text: "根据生物质浓度和活性重新制定安全的OLR提升计划：每次提升不超过10%，间隔不少于3天"
+        level: long_term
+      - text: "考虑增设在线COD监测仪，实时跟踪进水负荷波动"
+        level: long_term
+      - text: "评估是否需要增加反应器容积或增设调节池来缓冲高峰负荷"
+        level: long_term
+
+    preventive:
+      - text: "建立OLR台账，记录每日负荷、COD去除率和VFA水平的对应关系"
+        level: preventive
+      - text: "以COD去除率作为首要安全指标：去除率<70%时自动触发减负审查"
+        level: preventive
+      - text: "生产计划调整（增产）前，提前一周逐步提升反应器负荷以适应"
+        level: preventive
+      - text: "在线监测进水COD和流量，COD瞬时值超过正常值30%时触发预警"
+        level: preventive
+
+    by_reactor_type:
+      UASB:
+        - text: "UASB设计OLR通常5-15 kg COD/m³·d，颗粒污泥质量好的反应器可承受更高负荷"
+          level: long_term
+      EGSB:
+        - text: "EGSB采用高上升流速和颗粒污泥膨胀，OLR可达15-30 kg COD/m³·d，但水力冲击风险也更大"
+          level: long_term
+      CSTR:
+        - text: "CSTR生物质浓度通常较低（2-5 g-VSS/L），OLR上限有限（通常2-5 kg COD/m³·d）"
+          level: long_term
+      AnMBR:
+        - text: "AnMBR膜截留使SRT独立于HRT，可承受较高OLR，但需关注膜污染"
+          level: long_term
+
+  # ==========================================================================
+  # 5. 污泥流失 (Sludge Washout)
+  # ==========================================================================
+  sludge_washout:
+    detail: "HRT过短或水力冲击会导致活性生物质被冲出反应器。对UASB和EGSB等依赖颗粒污泥保留的反应器影响尤为显著——颗粒污泥形成需要数周至数月。流失后VSS/TSS比下降是好转标志。"
+
+    immediate:
+      - text: "立即降低进水流量至正常值的50%-70%，将HRT延长至设计最低值（UASB≥8h, EGSB≥6h, CSTR≥24h）以上"
+        level: immediate
+      - text: "检测出水TSS/VSS，确认流失的生物质类型（颗粒碎片 vs 絮状污泥 vs 惰性固体）"
+        level: immediate
+      - text: "若反应器为UASB/EGSB，检查颗粒污泥床是否隆起或解体——可能伴随产气量突然增加后下降"
+        level: immediate
+      - text: "降低上升流速（UASB/EGSB）至0.3-0.5 m/h，减少对污泥床的扰动力"
+        level: immediate
+      - text: "如有三相分离器，检查其是否堵塞或破损导致固液分离效率下降"
+        level: immediate
+
+    long_term:
+      - text: "若颗粒污泥已解体，需要2-4周时间重新颗粒化——期间维持稳定的低负荷运行"
+        level: long_term
+      - text: "考虑投加混凝剂（FeCl₃ 10-20 mg/L 或阳离子PAM 1-5 mg/L）改善污泥沉降性"
+        level: long_term
+      - text: "评估是否需要接种颗粒污泥（从其他正常运行的UASB/EGSB获取），接种量按反应器体积的10%-20%"
+        level: long_term
+      - text: "检查进水是否存在导致颗粒解体的物质：高浓度阳离子(Na⁺>5g/L, K⁺>2g/L)或表面活性剂"
+        level: long_term
+      - text: "如果污泥流失已超过总生物量的30%，考虑排空部分反应器并重新接种"
+        level: long_term
+
+    preventive:
+      - text: "安装进水流量调节池，缓冲瞬时流量波动；池容至少为最大时流量的1-2小时"
+        level: preventive
+      - text: "以出水TSS作为污泥流失超前指标：TSS突然升高50%以上时触发检查"
+        level: preventive
+      - text: "UASB/EGSB安装污泥床高度在线监测（超声波或差压法），床高突然下降是流失的早期信号"
+        level: preventive
+      - text: "进水安装格栅和沉砂池，防止大颗粒杂质冲击三相分离器"
+        level: preventive
+      - text: "定期（每季度）评估污泥床颗粒粒径分布，粒径<0.5mm比例增加预示颗粒解体"
+        level: preventive
+
+    by_reactor_type:
+      UASB:
+        - text: "UASB三相分离器是防流失的关键，检查气封是否被泡沫/浮渣堵塞"
+          level: immediate
+      EGSB:
+        - text: "EGSB回流比控制是关键——过高的上升流速(>6 m/h)会冲出颗粒污泥"
+          level: immediate
+      CSTR:
+        - text: "CSTR无污泥截留机制，HRT=SRT，需保证HRT≥20天以确保产甲烷菌不流失"
+          level: long_term
+      IC:
+        - text: "IC反应器上下两级的内循环系统是防流失的关键，检查一级分离器运行状态"
+          level: immediate
+      AnMBR:
+        - text: "AnMBR膜截留所有固体，HRT和SRT完全解耦，污泥流失风险低但需关注膜完整性和通量"
+          level: long_term
+
+  # ==========================================================================
+  # 6. 毒性抑制 (Toxic Inhibition)
+  # ==========================================================================
+  toxic_inhibition:
+    detail: "毒性化合物（重金属、杀菌剂、抗生素、硫化物、氰化物、酚类等）即使在低浓度下也能完全抑制产甲烷作用。产甲烷菌对毒性物质的敏感性是产酸菌的10-100倍。与酸化不同，毒性抑制通常表现为产气量急剧下降（数小时内下降50%以上）而非渐进变化。"
+
+    immediate:
+      - text: "立即停止进料！这是最关键的——每多进一分钟毒性物质，微生物损伤就加重一分"
+        level: immediate
+      - text: "立即排查上游是否有异常排放：工业生产中杀菌剂/清洗剂泄漏、消毒废水误排、新的化学药剂使用等"
+        level: immediate
+      - text: "若毒性物质已知且可被物理吸附，立即投加粉末活性炭(PAC) 500-2000 mg/L进行紧急吸附"
+        level: immediate
+      - text: "若可能且毒性物质已停止进入，用清洁水或低浓度废水缓慢冲洗反应器（替换1-2个反应器体积）"
+        level: immediate
+      - text: "取样送检：重金属(Cu, Zn, Cr, Ni, Cd, Pb, Hg)、杀菌剂、抗生素、氰化物、酚类、硫化物等"
+        level: immediate
+      - text: "检测比产甲烷活性(SMA)，评估产甲烷菌受损程度——SMA<0.1 g-COD-CH₄/g-VSS·d表示严重抑制"
+        level: immediate
+
+    long_term:
+      - text: "毒性抑制恢复时间取决于毒性物质类型和暴露时间——重金属抑制可能需要数周，有机毒性物质通常1-2周"
+        level: long_term
+      - text: "若产甲烷菌严重受损，考虑排出一部分污泥并接种健康厌氧污泥"
+        level: long_term
+      - text: "逐步恢复进料：从正常负荷的20%开始，每次提升10%，每次稳定2-3天后才能再次提升"
+        level: long_term
+      - text: "投加螯合剂(EDTA 50-100 mg/L)络合重金属，或投加FeCl₃沉淀硫化物"
+        level: long_term
+      - text: "评估增设预处理工艺的必要性：重金属化学沉淀、高级氧化(AOP)破解毒性的有机物"
+        level: long_term
+
+    preventive:
+      - text: "建立进料毒性筛查制度：对工业进料每日检测重金属、每月检测杀菌剂/抗生素"
+        level: preventive
+      - text: "安装在线毒性预警装置（如基于产甲烷活性的生物传感器或呼吸仪），毒性物质进入时30分钟内报警"
+        level: preventive
+      - text: "对已知毒性物质设置预处理工序：重金属沉淀池、活性炭吸附塔、高级氧化单元"
+        level: preventive
+      - text: "常备粉末活性炭(PAC)和混凝剂，确保紧急情况下可在30分钟内投加"
+        level: preventive
+      - text: "编制上游企业/车间化学品清单，与生产部门建立异常排放通报机制"
+        level: preventive
+
+    by_reactor_type:
+      CSTR:
+        - text: "CSTR完全混合使毒性物质快速分布到整个反应器——毒性影响更均匀但也更难局部隔离"
+          level: long_term
+      UASB:
+        - text: "UASB底部污泥浓度高，毒性物质可能先在底部积累——分层取样确认污染深度"
+          level: immediate
+      AnMBR:
+        - text: "AnMBR膜可截留部分大分子毒性物质，但也可能导致毒性物质在反应器内累积"
+          level: long_term
+
+  # ==========================================================================
+  # 7. 硫化物抑制 (Sulfide Inhibition)
+  # ==========================================================================
+  sulfide_inhibition:
+    detail: "硫酸盐还原菌(SRB)与产甲烷菌竞争乙酸和H₂，产物H₂S在50-150 mg/L（溶解态）时即可抑制产甲烷菌。H₂S毒性随pH降低而增强（低pH下更多以H₂S而非HS⁻形式存在，H₂S更容易穿透细胞膜）。"
+
+    immediate:
+      - text: "检测进料和反应器内硫酸盐浓度，计算COD/SO₄²⁻比值——比值<10时SRB竞争优势明显"
+        level: immediate
+      - text: "添加铁盐(FeCl₃或FeCl₂)沉淀硫化物：理论投加量Fe:S = 1.75:1（质量比），实际按2:1投加以确保沉淀完全"
+        level: immediate
+      - text: "将pH提高至7.5-7.8，使H₂S更多以HS⁻形式存在（毒性和挥发性均降低）"
+        level: immediate
+      - text: "增加沼气排出速率或微曝气（<0.1 L空气/L反应器·h），将H₂S从液相中汽提出来"
+        level: immediate
+      - text: "检测沼气中H₂S含量（用Drager管或在线H₂S检测仪），判断硫化物在气相/液相中的分配"
+        level: immediate
+
+    long_term:
+      - text: "若进料硫酸盐长期偏高，考虑增设硫酸盐还原预处理单元（SRB池）——在进反应器之前将硫酸盐转化为可沉淀的硫化物"
+        level: long_term
+      - text: "投加硝酸盐(NO₃⁻)或亚硝酸盐，促进自养硝酸盐还原菌与SRB竞争，抑制硫酸盐还原"
+        level: long_term
+      - text: "评估铁盐投加的经济性和长期运行可行性，大型反应器可设永久投药装置"
+        level: long_term
+      - text: "监控SRB菌群变化，通过qPCR或FISH检测SRB与产甲烷菌的比例"
+        level: long_term
+
+    preventive:
+      - text: "监测进水硫酸盐浓度（SO₄²⁻），控制COD/SO₄²⁻比值 > 10:1 以抑制SRB竞争"
+        level: preventive
+      - text: "对高硫酸盐废水（如造纸、制糖、化工废水）建立专门的预处理方案"
+        level: preventive
+      - text: "定期检测沼气H₂S，早期发现SRB活性增加——H₂S增加通常比甲烷下降早出现"
+        level: preventive
+      - text: "维持pH在7.2-7.8范围，有利于减少H₂S毒性"
+        level: preventive
+
+  # ==========================================================================
+  # 8. 营养缺乏 (Nutrient Deficiency)
+  # ==========================================================================
+  nutrient_deficiency:
+    detail: "产甲烷菌需要Co、Ni、Fe、Mo、Se、W等微量元素作为酶辅因子。工业废水（尤其化工、电子、纺织行业）常缺乏这些元素。缺乏时表现为产甲烷活性缓慢下降（数周至数月），难以通过常规参数分析发现，是'隐形杀手'。"
+
+    immediate:
+      - text: "立即检测反应器内微量元素浓度，重点关注：Co（<0.01 mg/L缺乏）、Ni（<0.02 mg/L缺乏）、Fe（<1.0 mg/L缺乏）、Mo（<0.01 mg/L缺乏）、Se（<0.005 mg/L缺乏）"
+        level: immediate
+      - text: "补充微量元素混合液，推荐剂量（以反应器容积计）：CoCl₂·6H₂O 0.5 mg/L, NiCl₂·6H₂O 1.0 mg/L, FeCl₂·4H₂O 25 mg/L, Na₂MoO₄·2H₂O 0.25 mg/L, Na₂SeO₃ 0.05 mg/L, Na₂WO₄·2H₂O 0.1 mg/L"
+        level: immediate
+      - text: "检查进料C:N:P比例是否合适（推荐COD:N:P = 350:5:1），宏量营养缺乏同样影响微生物活性"
+        level: immediate
+      - text: "若N或P不足，补充尿素(N)和磷酸(H₃PO₄或KH₂PO₄)，按所需比例计算投加量"
+        level: immediate
+
+    long_term:
+      - text: "建立微量元素补充的常规制度：根据进料特性和出水浓度，确定每日/每周补充量"
+        level: long_term
+      - text: "定期（每季度）送检微量元素全分析，建立数据趋势基线"
+        level: long_term
+      - text: "对于长期缺乏微量元素的反应器，补充后1-2周才能看到明显改善——产甲烷菌需要时间合成新酶"
+        level: long_term
+      - text: "评估进料来源：如果进料主要是单一工业废水，考虑与生活污水或食品废水共消化补充营养"
+        level: long_term
+
+    preventive:
+      - text: "对纯工业废水进料，建立微量元素常规补充方案——预防性投加比纠正性投加更有效"
+        level: preventive
+      - text: "每季度检测一次反应器内微量元素浓度，建立趋势档案"
+        level: preventive
+      - text: "进料来源发生变化（新增/更换上游产品）时，重新评估营养需求"
+        level: preventive
+
+    by_reactor_type:
+      CSTR:
+        - text: "CSTR完全混合有利于微量元素均匀分布，补充效果通常更好"
+          level: long_term
+      UASB:
+        - text: "UASB颗粒污泥内部传质限制可能导致微量元素利用效率较低，适当提高补充剂量"
+          level: long_term
+
+  # ==========================================================================
+  # 9. 钙沉积 (Calcium Precipitation)
+  # ==========================================================================
+  calcium_precipitation:
+    detail: "高钙进料中Ca²⁺与反应器内CO₃²⁻反应生成CaCO₃沉淀，沉积在污泥颗粒上导致'灰分化'。长期运行中可导致反应器有效容积减少10%-30%，活性生物量比例下降，COD去除率缓慢下降。乳制品、造纸、垃圾渗滤液处理中尤为常见。"
+
+    immediate:
+      - text: "检测进料和反应器出水中Ca²⁺浓度，以及污泥灰分含量（VS/TS比）；VS/TS < 0.5时表明灰分化严重"
+        level: immediate
+      - text: "如果原因确认为钙沉积，将进水pH微调至6.8-7.0（CaCO₃在低pH下溶解度更高）"
+        level: immediate
+      - text: "增加排泥频率和排泥量（按正常排泥量的1.5-2倍），排出灰分化污泥"
+        level: immediate
+      - text: "检查反应器有效容积是否因沉积物占据而减小（液位变化法或示踪剂法）"
+        level: immediate
+
+    long_term:
+      - text: "评估增设化学除钙预处理：投加Na₂CO₃在预处理阶段沉淀Ca²⁺（而非在反应器内），控制预处理后Ca²⁺ < 50 mg/L"
+        level: long_term
+      - text: "考虑增设Ca²⁺在线监测和自动加药系统"
+        level: long_term
+      - text: "长期解决方案：考虑使用离子交换树脂除钙或石灰-苏打法预处理"
+        level: long_term
+      - text: "定期排泥计划：每月排出反应器总污泥量的5%-10%，防止无机物过度积累"
+        level: long_term
+
+    preventive:
+      - text: "对进料Ca²⁺浓度定期监测，Ca²⁺ > 100 mg/L时启动预防性排泥"
+        level: preventive
+      - text: "维持进水pH在7.0左右（不过高），减少CaCO₃在反应器内的生成驱动力"
+        level: preventive
+      - text: "每半年评估一次污泥灰分含量（VS/TS比），比值逐年下降时考虑增设预处理"
+        level: preventive
+      - text: "设计阶段考虑Ca²⁺去除需求，预留预处理空间和污泥处置能力"
+        level: preventive

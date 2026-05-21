@@ -1,0 +1,90 @@
+parameters:
+  ph:
+    unit: ""
+    normal: [6.8, 7.5]
+    warning_low: [6.5, 6.8]
+    warning_high: [7.5, 7.8]
+    alarm_low: [0, 6.5]
+    alarm_high: [7.8, 14]
+    description: "pH is critical for methanogen activity; optimal range 6.8-7.5"
+
+  temperature:
+    unit: "°C"
+    normal: [30, 40]
+    warning_low: [28, 30]
+    warning_high: [40, 42]
+    alarm_low: [0, 28]
+    alarm_high: [42, 100]
+    description: "Temperature affects microbial metabolism rate"
+
+  vfa:
+    unit: "mg/L"
+    normal: [0, 300]
+    warning_range: [300, 500]
+    alarm_range: [500, 99999]
+    description: "VFA accumulation indicates imbalance between acidogens and methanogens"
+
+  alkalinity:
+    unit: "mg CaCO3/L"
+    normal: [1000, 5000]
+    warning_low: [500, 1000]
+    alarm_low: [0, 500]
+    description: "Alkalinity provides buffer capacity against pH drop"
+
+  cod_removal_rate:
+    unit: "%"
+    normal: [70, 100]
+    warning_range: [50, 70]
+    alarm_range: [0, 50]
+    description: "COD removal rate reflects overall reactor performance"
+
+  vfa_alkalinity_ratio:
+    unit: ""
+    normal: [0, 0.3]
+    warning_range: [0.3, 0.5]
+    alarm_range: [0.5, 999]
+    description: "VFA/Alkalinity ratio > 0.3-0.5 signals acidification risk"
+
+  orp:
+    unit: "mV"
+    normal: [-500, -300]
+    warning_range: [-300, -200]
+    alarm_range: [-200, 999]
+    description: "ORP must be negative for anaerobic conditions"
+
+  biogas_production:
+    unit: "m³/d"
+    normal: [10, 99999]
+    warning_range: [5, 10]
+    alarm_range: [0, 5]
+    description: "Biogas production rate; normal range depends on reactor size"
+
+  methane_content:
+    unit: "%"
+    normal: [55, 70]
+    warning_low: [45, 55]
+    warning_high: [70, 75]
+    alarm_low: [0, 45]
+    alarm_high: [75, 100]
+    description: "Methane content in biogas normally 55-70%"
+
+  olr:
+    unit: "kg COD/m³·d"
+    normal: [2, 10]
+    warning_range: [10, 15]
+    alarm_range: [15, 999]
+    description: "Organic Loading Rate; UASB typically 2-10 kg COD/m³·d"
+
+  hrt:
+    unit: "h"
+    normal: [6, 48]
+    warning_low: [4, 6]
+    alarm_low: [0, 4]
+    description: "Hydraulic Retention Time; shorter HRT risks biomass washout"
+
+  nh3_n:
+    unit: "mg/L"
+    normal: [0, 80]
+    warning_range: [80, 150]
+    alarm_range: [150, 99999]
+    description: "Free ammonia nitrogen; >150 mg/L can inhibit methanogens"

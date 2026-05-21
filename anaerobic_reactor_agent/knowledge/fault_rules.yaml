@@ -1,0 +1,420 @@
+rules:
+  # ============================================================
+  # 酸化 (Acidification) — 最优先故障
+  # ============================================================
+  - name: acidification_classic
+    description: "经典酸化模式：VFA升高、pH下降、VFA/碱度比值升高。产酸菌活性超过产甲烷菌，导致有机酸积累。"
+    fault_type: acidification
+    priority: 1
+    severity: alarm
+    min_confidence: 0.5
+    causal_chain: "有机负荷增加 → 产酸菌快速产VFA → 产甲烷菌消耗不及 → VFA积累 → 碱度缓冲消耗 → pH下降 → 产甲烷菌进一步受抑制 → 正反馈恶化"
+    conditions:
+      - parameter: vfa
+        operator: ">"
+        value: 400
+        weight: 0.25
+        fuzzy: true
+      - parameter: ph
+        operator: "<"
+        value: 6.5
+        weight: 0.35
+        fuzzy: true
+      - parameter: vfa_alkalinity_ratio
+        operator: ">"
+        value: 0.5
+        weight: 0.40
+        fuzzy: false
+    recommendations:
+      - text: "立即降低有机负荷30%-50%，减少产酸底物来源"
+        level: immediate
+      - text: "若pH<6.3，投加NaHCO₃（0.5-1.0 g/g-VFA）恢复碱度，分3-4次加入，间隔2小时"
+        level: immediate
+      - text: "增加回流比至200%-300%，利用出水碱度稀释VFA浓度"
+        level: immediate
+      - text: "若VFA/碱度比>0.8，暂停进料2-4小时，仅维持回流循环"
+        level: immediate
+      - text: "检测VFA组分（乙酸/丙酸/丁酸），丙酸/乙酸比>1.4提示恢复难度更大"
+        level: immediate
+      - text: "VFA降至<300且VFA/碱度比<0.3后，以每次≤10%幅度逐步恢复进料"
+        level: long_term
+      - text: "检查搅拌/混合系统，确保碱度与酸性物质充分接触"
+        level: long_term
+      - text: "维持进水碱度≥1000 mg CaCO₃/L，COD:碱度控制在1:0.2-0.4"
+        level: preventive
+      - text: "安装在线VFA/pH监测，设置VFA>300或pH<6.8自动报警"
+        level: preventive
+
+  - name: acidification_early_warning
+    description: "酸化早期信号：VFA开始上升、VFA/碱度比值上升趋势、pH暂未被打破"
+    fault_type: acidification
+    priority: 2
+    severity: warning
+    min_confidence: 0.4
+    causal_chain: "VFA呈上升趋势 → VFA/碱度比值逼近临界值 → 碱度尚能缓冲 → pH仍在正常范围 → 若不干预将在24-48小时内发展为显性酸化"
+    conditions:
+      - parameter: vfa
+        operator: ">"
+        value: 300
+        weight: 0.30
+        fuzzy: true
+      - parameter: vfa_alkalinity_ratio
+        operator: ">"
+        value: 0.3
+        weight: 0.40
+        fuzzy: true
+      - parameter: ph
+        operator: "<"
+        value: 6.8
+        weight: 0.30
+        fuzzy: true
+    recommendations:
+      - text: "加密监测VFA和pH，每4-6小时测定一次，跟踪变化趋势"
+        level: immediate
+      - text: "预防性降低OLR 10%-20%，避免进入显性酸化阶段"
+        level: immediate
+      - text: "检查并补充进水碱度，目标VFA/碱度比<0.3"
+        level: long_term
+      - text: "排查进料是否含有大量易降解有机物（糖类、有机酸等产酸速率快的物质）"
+        level: long_term
+      - text: "建立VFA趋势跟踪图，连续3次上升即触发预警响应"
+        level: preventive
+
+  # ============================================================
+  # 氨抑制 (Ammonia Inhibition)
+  # ============================================================
+  - name: ammonia_inhibition
+    description: "氨抑制：NH₃-N升高伴随甲烷产率下降。游离氨穿透细胞膜破坏产甲烷菌质子平衡。"
+    fault_type: ammonia_inhibition
+    priority: 3
+    severity: alarm
+    min_confidence: 0.5
+    causal_chain: "高蛋白进料 → 氨氮释放 → 高pH/高温度增加游离氨比例 → NH₃穿透细胞膜 → 产甲烷菌质子失衡 → 甲烷产量下降 → VFA积累 → 二次酸化风险"
+    conditions:
+      - parameter: nh3_n
+        operator: ">"
+        value: 150
+        weight: 0.40
+        fuzzy: true
+      - parameter: methane_content
+        operator: "<"
+        value: 50
+        weight: 0.30
+      - parameter: ph
+        operator: ">"
+        value: 7.8
+        weight: 0.30
+    recommendations:
+      - text: "立即降低高蛋白/高氮进料比例50%以上，或切换至低氮备用水源"
+        level: immediate
+      - text: "降低运行温度1-2°C（在产甲烷菌耐受范围内），30°C时的游离氨比例约为35°C时的70%"
+        level: immediate
+      - text: "若pH>7.8，将pH控制在7.2-7.5范围以减少游离氨生成"
+        level: immediate
+      - text: "稀释进水至NH₃-N<100 mg/L，或添加易降解碳源提高C/N比至20:1以上"
+        level: immediate
+      - text: "计算实际游离氨浓度：NH₃=TAN×(1+10^(pKa-pH))⁻¹，pKa=0.09018+2729.92/(T+273.15)"
+        level: long_term
+      - text: "氨抑制恢复需1-2个SRT周期，逐步恢复进料（每次5%-10%）"
+        level: long_term
+      - text: "投加沸石（50-100 g/L）利用离子交换吸附NH₄⁺"
+        level: long_term
+      - text: "维持C/N比在20-30:1范围，氨氮>100时控制pH≤7.5"
+        level: preventive
+      - text: "评估增设氨吹脱或鸟粪石沉淀预处理的需求"
+        level: preventive
+
+  # ============================================================
+  # 温度冲击 (Temperature Shock)
+  # ============================================================
+  - name: temperature_shock
+    description: "温度冲击：温度偏离中温范围，产甲烷菌膜流动性受损，酶活性下降"
+    fault_type: temperature_shock
+    priority: 4
+    severity: alarm
+    min_confidence: 0.5
+    causal_chain: "环境温度骤变/加热故障 → 温度偏离最适范围 → 产甲烷菌细胞膜流动性改变 → 酶活性降低 → 底物消耗速率下降 → VFA积累 → pH下降"
+    conditions:
+      - parameter: temperature
+        operator: "not_between"
+        value: [28, 42]
+        weight: 0.50
+      - parameter: biogas_production
+        operator: "<"
+        value: 10
+        weight: 0.30
+      - parameter: cod_removal_rate
+        operator: "<"
+        value: 60
+        weight: 0.20
+    recommendations:
+      - text: "低温冲击：逐步升温（≤2°C/天）；高温冲击：降温速率3-5°C/h但不超过5°C/h"
+        level: immediate
+      - text: "温度恢复期间将OLR降至正常值的50%，减轻微生物代谢负担"
+        level: immediate
+      - text: "检查加热/冷却系统是否故障，排查热源（锅炉、换热器、蒸汽管路）"
+        level: immediate
+      - text: "每小时监测沼气产量和甲烷含量，跟踪微生物活性恢复趋势"
+        level: immediate
+      - text: "温度冲击后6-12小时可能出现VFA积累的延迟信号，持续监测"
+        level: long_term
+      - text: "温度恢复正常后维持低OLR 1-2天，待活性恢复再逐步提升"
+        level: long_term
+      - text: "安装PID温度自控系统和保温层，精度控制在±1°C"
+        level: preventive
+      - text: "寒冷季节预热进水至反应器温度±2°C范围内"
+        level: preventive
+      - text: "设置温度异常报警（偏离设定值±3°C自动触发通知）"
+        level: preventive
+
+  # ============================================================
+  # 有机负荷过高 (Organic Overload)
+  # ============================================================
+  - name: organic_overload
+    description: "有机负荷过高：OLR超过反应器产甲烷能力，中间产物积累"
+    fault_type: organic_overload
+    priority: 2
+    severity: warning
+    min_confidence: 0.5
+    causal_chain: "进水COD/流量增加 → OLR超过设计值 → 产酸菌快速响应 → 产甲烷菌响应滞后 → VFA暂时性积累 → 若碱度充足可缓冲，否则发展为酸化"
+    conditions:
+      - parameter: olr
+        operator: ">"
+        value: 10
+        weight: 0.35
+      - parameter: cod_removal_rate
+        operator: "<"
+        value: 70
+        weight: 0.35
+      - parameter: vfa
+        operator: ">"
+        value: 300
+        weight: 0.30
+        fuzzy: true
+    recommendations:
+      - text: "立即将OLR降至设计值或安全负荷（通常需降低30%-50%）"
+        level: immediate
+      - text: "检查进水COD和流量是否异常，排查上游是否有意外排放"
+        level: immediate
+      - text: "若COD去除率已降至60%以下，考虑暂停进料2-4小时缓冲恢复"
+        level: immediate
+      - text: "每2小时监测VFA趋势，判断是恶化还是好转"
+        level: immediate
+      - text: "分析反应器实际生物质浓度和比产甲烷活性，计算安全OLR上限"
+        level: long_term
+      - text: "制定安全OLR提升计划：每次提升≤10%，间隔≥3天"
+        level: long_term
+      - text: "以COD去除率作为安全指标：去除率<70%自动触发减负审查"
+        level: preventive
+      - text: "在线监测进水COD和流量，瞬时值超过正常值30%时触发预警"
+        level: preventive
+
+  # ============================================================
+  # 污泥流失 (Sludge Washout)
+  # ============================================================
+  - name: sludge_washout
+    description: "污泥流失：HRT过短或水力冲击导致活性生物质流失，COD去除能力下降"
+    fault_type: sludge_washout
+    priority: 5
+    severity: warning
+    min_confidence: 0.5
+    causal_chain: "进水流量突增 → HRT缩短 → 颗粒污泥/絮状污泥被冲出 → 反应器内生物量降低 → COD去除率下降 → 有机负荷相对升高 → VFA积累"
+    conditions:
+      - parameter: hrt
+        operator: "<"
+        value: 6
+        weight: 0.50
+      - parameter: cod_removal_rate
+        operator: "<"
+        value: 65
+        weight: 0.50
+    recommendations:
+      - text: "立即降低进水流量至正常值的50%-70%，延长HRT至设计最低值以上"
+        level: immediate
+      - text: "检测出水TSS/VSS，确认流失的生物质类型（颗粒碎片/絮状污泥/惰性固体）"
+        level: immediate
+      - text: "UASB/EGSB降低上升流速至0.3-0.5 m/h，检查三相分离器是否堵塞或破损"
+        level: immediate
+      - text: "颗粒污泥解体需2-4周重新颗粒化，期间维持稳定的低负荷运行"
+        level: long_term
+      - text: "考虑投加混凝剂（FeCl₃ 10-20 mg/L或阳离子PAM 1-5 mg/L）改善沉降性"
+        level: long_term
+      - text: "若污泥流失>30%，评估是否需要接种新鲜颗粒污泥（10%-20%体积比）"
+        level: long_term
+      - text: "安装进水流量调节池（至少1-2小时容量），缓冲瞬时流量波动"
+        level: preventive
+      - text: "以出水TSS作为超前指标：TSS突然升高50%以上触发检查"
+        level: preventive
+      - text: "定期评估颗粒污泥粒径分布，粒径<0.5mm比例增加预示解体风险"
+        level: preventive
+
+  # ============================================================
+  # 毒性抑制 (Toxic Inhibition)
+  # ============================================================
+  - name: toxic_inhibition
+    description: "毒性抑制：产气量骤降、甲烷含量降低，可能由重金属、杀菌剂、硫化物等毒性物质引起"
+    fault_type: toxic_inhibition
+    priority: 1
+    severity: critical
+    min_confidence: 0.5
+    causal_chain: "毒性物质进入反应器 → 直接抑制产甲烷菌 → 沼气产量急剧下降 → COD去除率崩溃 → 代谢产物积累 → 反应器酸化 → 若不处理将导致系统崩溃"
+    conditions:
+      - parameter: biogas_production
+        operator: "<"
+        value: 5
+        weight: 0.35
+      - parameter: methane_content
+        operator: "<"
+        value: 45
+        weight: 0.35
+      - parameter: ph
+        operator: "<"
+        value: 6.0
+        weight: 0.30
+    recommendations:
+      - text: "立即停止进料！每多进一分钟毒性物质，微生物损伤就加重一分"
+        level: immediate
+      - text: "立即排查上游异常排放：杀菌剂泄漏、消毒废水误排、新化学品使用等"
+        level: immediate
+      - text: "投加粉末活性炭(PAC) 500-2000 mg/L进行紧急吸附"
+        level: immediate
+      - text: "若可能且毒源已切断，用清洁水缓慢冲洗反应器（替换1-2个反应器体积）"
+        level: immediate
+      - text: "取样送检：重金属(Cu,Zn,Cr,Ni,Cd,Pb,Hg)、杀菌剂、抗生素、氰化物、酚类、硫化物"
+        level: immediate
+      - text: "检测比产甲烷活性(SMA)，SMA<0.1 g-COD-CH₄/g-VSS·d表示严重抑制"
+        level: long_term
+      - text: "恢复进料从正常负荷20%开始，每次提升10%，稳定2-3天后再提升"
+        level: long_term
+      - text: "投加螯合剂(EDTA 50-100 mg/L)络合重金属，或FeCl₃沉淀硫化物"
+        level: long_term
+      - text: "建立进料毒性筛查制度，对工业进料每日检测重金属"
+        level: preventive
+      - text: "常备PAC和混凝剂，确保紧急情况下30分钟内可投加"
+        level: preventive
+      - text: "编制上游企业化学品清单，建立异常排放通报机制"
+        level: preventive
+
+  # ============================================================
+  # 硫化物抑制 (Sulfide Inhibition)
+  # ============================================================
+  - name: sulfide_inhibition
+    description: "硫化物抑制：硫酸盐还原菌与产甲烷菌竞争底物，产生的H₂S对产甲烷菌有毒性"
+    fault_type: sulfide_inhibition
+    priority: 5
+    severity: warning
+    min_confidence: 0.5
+    causal_chain: "进水硫酸盐浓度高 → 硫酸盐还原菌(SRB)活化 → SRB与产甲烷菌竞争乙酸和H₂ → 产生H₂S → H₂S抑制产甲烷菌 → 甲烷产量下降 → 沼气中H₂S含量升高"
+    conditions:
+      - parameter: methane_content
+        operator: "<"
+        value: 50
+        weight: 0.40
+      - parameter: biogas_production
+        operator: "<"
+        value: 15
+        weight: 0.30
+      - parameter: ph
+        operator: "<"
+        value: 6.8
+        weight: 0.30
+    recommendations:
+      - text: "检测进料和反应器内硫酸盐浓度，计算COD/SO₄²⁻比值（<10时SRB占优）"
+        level: immediate
+      - text: "添加铁盐(FeCl₃/FeCl₂)沉淀硫化物：理论投加量Fe:S=1.75:1，实际按2:1确保沉淀完全"
+        level: immediate
+      - text: "提高pH至7.5-7.8，使H₂S以HS⁻形式存在（毒性和挥发性均降低）"
+        level: immediate
+      - text: "检测沼气中H₂S含量，评估硫化物在气相/液相中的分配比例"
+        level: long_term
+      - text: "若进料硫酸盐长期偏高，评估增设硫酸盐还原预处理单元"
+        level: long_term
+      - text: "投加硝酸盐促进自养硝酸盐还原菌竞争抑制SRB"
+        level: long_term
+      - text: "控制COD/SO₄²⁻比值>10:1以抑制SRB竞争，沼气H₂S增加是早期信号"
+        level: preventive
+      - text: "高硫酸盐废水建立专门预处理方案，维持pH在7.2-7.8范围"
+        level: preventive
+
+  # ============================================================
+  # 营养缺乏 (Nutrient Deficiency)
+  # ============================================================
+  - name: nutrient_deficiency
+    description: "微量元素/营养缺乏：产甲烷菌缺乏必需的微量元素(Co, Ni, Fe, Mo等)，活性下降"
+    fault_type: nutrient_deficiency
+    priority: 6
+    severity: warning
+    min_confidence: 0.5
+    causal_chain: "进料成分单一/缺乏微量元素 → 产甲烷菌酶合成受阻 → 产甲烷活性逐渐下降 → COD去除率下降 → VFA缓慢积累 → 沼气产量减少"
+    conditions:
+      - parameter: cod_removal_rate
+        operator: "<"
+        value: 60
+        weight: 0.35
+      - parameter: vfa
+        operator: ">"
+        value: 250
+        weight: 0.35
+        fuzzy: true
+      - parameter: biogas_production
+        operator: "<"
+        value: 20
+        weight: 0.30
+    recommendations:
+      - text: "立即检测反应器内微量元素：Co（<0.01缺）、Ni（<0.02缺）、Fe（<1.0缺）、Mo（<0.01缺）、Se（<0.005缺）mg/L"
+        level: immediate
+      - text: "补充微量元素混合液：CoCl₂ 0.5, NiCl₂ 1.0, FeCl₂ 25, Na₂MoO₄ 0.25, Na₂SeO₃ 0.05, Na₂WO₄ 0.1 mg/L"
+        level: immediate
+      - text: "检查进料C:N:P比例（推荐COD:N:P=350:5:1），N或P不足时补充尿素/磷酸"
+        level: immediate
+      - text: "补充后1-2周才能看到明显改善——产甲烷菌需要时间合成新酶"
+        level: long_term
+      - text: "若进料为单一工业废水，考虑与生活污水或食品废水共消化来补充营养"
+        level: long_term
+      - text: "建立微量元素常规补充制度，预防性投加比纠正性投加更有效"
+        level: preventive
+      - text: "每季度检测微量元素浓度，进料来源变化时重新评估营养需求"
+        level: preventive
+
+  # ============================================================
+  # 钙沉积 (Calcium Precipitation)
+  # ============================================================
+  - name: calcium_precipitation
+    description: "钙沉积：高钙进料导致反应器内碳酸钙沉积，占据有效体积，降低活性"
+    fault_type: calcium_precipitation
+    priority: 7
+    severity: warning
+    min_confidence: 0.5
+    causal_chain: "进水钙离子浓度高 → 与CO₂/HCO₃⁻反应生成CaCO₃ → CaCO₃沉积在污泥颗粒上 → 颗粒灰分化 → 活性生物量比例下降 → COD去除率缓慢下降"
+    conditions:
+      - parameter: alkalinity
+        operator: ">"
+        value: 4000
+        weight: 0.30
+      - parameter: cod_removal_rate
+        operator: "<"
+        value: 55
+        weight: 0.40
+      - parameter: ph
+        operator: ">"
+        value: 7.5
+        weight: 0.30
+    recommendations:
+      - text: "检测进料和出水Ca²⁺浓度，以及污泥VS/TS比——VS/TS<0.5表明灰分化严重"
+        level: immediate
+      - text: "将进水pH微调至6.8-7.0（CaCO₃在低pH下溶解度更高），减少沉积"
+        level: immediate
+      - text: "增加排泥频率和排泥量（按正常的1.5-2倍），排出灰分化污泥"
+        level: immediate
+      - text: "评估增设化学除钙预处理：投加Na₂CO₃在预处理阶段沉淀Ca²⁺（控制Ca²⁺<50 mg/L）"
+        level: long_term
+      - text: "每月排出反应器总污泥量的5%-10%，防止无机物过度积累"
+        level: long_term
+      - text: "考虑离子交换树脂除钙或石灰-苏打法预处理"
+        level: long_term
+      - text: "定期监测进料Ca²⁺浓度，Ca²⁺>100 mg/L时启动预防性排泥"
+        level: preventive
+      - text: "维持进水pH在7.0左右，减少CaCO₃在反应器内的生成驱动力"
+        level: preventive
+      - text: "每半年评估污泥灰分含量（VS/TS比），比值逐年下降时考虑增设预处理"
+        level: preventive
