@@ -3,7 +3,7 @@
 import logging
 
 from .base import LLMProvider
-from .prompts import SYSTEM_PROMPT, build_user_prompt
+from .prompts import SYSTEM_PROMPT, build_user_prompt, build_compact_summary
 from ..utils.exceptions import LLMAuthError, LLMTimeoutError, LLMRateLimitError
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ class ClaudeProvider(LLMProvider):
 
         client = anthropic.Anthropic(api_key=self._api_key)
 
-        diagnosis_json = diagnosis.model_dump_json(indent=2)
+        summary = build_compact_summary(diagnosis)
 
         try:
             response = client.messages.create(
@@ -42,7 +42,7 @@ class ClaudeProvider(LLMProvider):
                 max_tokens=2048,
                 system=SYSTEM_PROMPT,
                 messages=[
-                    {"role": "user", "content": build_user_prompt(diagnosis_json)},
+                    {"role": "user", "content": build_user_prompt(summary)},
                 ],
                 timeout=LLM_TIMEOUT_SECONDS,
             )

@@ -31,4 +31,4 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 # ===== LLM Settings =====
 LLM_DEFAULT_MODEL = os.getenv("ANAEROBIC_AGENT_LLM_MODEL", "claude-sonnet-4-6")
 LLM_DEFAULT_PROVIDER = os.getenv("ANAEROBIC_AGENT_LLM_PROVIDER", "")  # auto-detect if empty
-LLM_TIMEOUT_SECONDS = int(os.getenv("ANAEROBIC_AGENT_LLM_TIMEOUT", "30"))
+LLM_TIMEOUT_SECONDS = int(os.getenv("ANAEROBIC_AGENT_LLM_TIMEOUT", "120"))

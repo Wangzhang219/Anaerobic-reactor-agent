@@ -336,11 +336,25 @@ table{{width:100%;border-collapse:collapse}} th{{background:#1a1a2e;color:white;
 def _run_llm_analysis(result):
     """调用大模型进行专家分析。"""
     from anaerobic_reactor_agent.llm.factory import create_provider
+    from anaerobic_reactor_agent.utils.exceptions import LLMTimeoutError, LLMAuthError, LLMRateLimitError
+
     try:
         provider_type = st.session_state.get("llm_provider_type") or None
         provider = create_provider(provider_type=provider_type)
-        if provider:
+        if provider is None:
+            st.session_state._llm_error = "未找到可用的 AI 模型，请检查 API Key 是否正确配置。"
+            st.session_state.llm_enabled = False
+            return
+
+        with st.spinner("🤖 AI 专家正在分析（最长等待2分钟）..."):
             result.llm_analysis = provider.analyze(result)
             result.llm_model = provider.model_name
+            st.session_state._llm_error = None
+    except LLMTimeoutError:
+        st.warning("AI 分析超时——诊断数据较多，DeepSeek 响应较慢。请重试一次，或切换更快的模型。")
+    except LLMAuthError:
+        st.warning("AI 分析失败：API Key 无效，请检查后重试。")
+    except LLMRateLimitError:
+        st.warning("AI 分析失败：API 调用频率超限，请稍后重试。")
     except Exception as e:
         st.warning(f"AI 分析不可用：{e}")

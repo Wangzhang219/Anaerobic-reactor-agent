@@ -66,3 +66,51 @@ def build_user_prompt(diagnosis_json: str) -> str:
 {diagnosis_json}
 
 请基于你的专业经验，分析反应器状况、故障根本原因，并提供具体的、可量化的处理建议。"""
+
+
+def build_compact_summary(result) -> str:
+    """Build a compact text summary of diagnosis (avoids 19KB+ JSON payload that causes timeout)."""
+    from ..models.diagnosis import ParameterStatus
+
+    status_cn = {"normal": "正常", "warning": "预警", "alarm": "报警"}
+    fault_cn = {
+        "acidification": "酸化", "ammonia_inhibition": "氨抑制",
+        "temperature_shock": "温度冲击", "organic_overload": "有机负荷过高",
+        "sludge_washout": "污泥流失", "toxic_inhibition": "毒性抑制",
+        "sulfide_inhibition": "硫化物抑制", "nutrient_deficiency": "营养缺乏",
+        "calcium_precipitation": "钙沉积",
+    }
+
+    lines = []
+    lines.append(f"总体状态: {status_cn.get(result.overall_status.value, result.overall_status.value)}")
+    lines.append(f"故障数量: {len(result.faults)}")
+
+    # Key parameters (only abnormal ones)
+    abnormal = [a for a in result.parameter_assessments if a.status != ParameterStatus.NORMAL]
+    if abnormal:
+        lines.append("")
+        lines.append("异常参数:")
+        for a in abnormal:
+            lines.append(f"  - {a.parameter_name}: {a.current_value} (正常范围: {a.normal_range})")
+
+    # Faults
+    if result.faults:
+        lines.append("")
+        lines.append("诊断故障:")
+        for f in result.faults:
+            cn = fault_cn.get(f.fault_type, f.fault_type)
+            lines.append(f"  [{f.severity.value}] {cn} (置信度:{f.confidence:.0%})")
+            lines.append(f"    描述: {f.description}")
+            # Only include top 3 recommendations per fault
+            for r in f.recommendations[:3]:
+                lines.append(f"    - [{r.level}] {r.text}")
+
+    # Top 5 overall recommendations
+    top_recs = result.recommendations[:5]
+    if top_recs:
+        lines.append("")
+        lines.append("优先建议:")
+        for r in top_recs:
+            lines.append(f"  - [{r.level}] {r.text}")
+
+    return "\n".join(lines)

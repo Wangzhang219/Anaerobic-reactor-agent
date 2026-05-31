@@ -3,7 +3,7 @@
 import logging
 
 from .base import LLMProvider
-from .prompts import SYSTEM_PROMPT, build_user_prompt
+from .prompts import SYSTEM_PROMPT, build_user_prompt, build_compact_summary
 from ..utils.exceptions import LLMAuthError, LLMTimeoutError, LLMRateLimitError
 
 logger = logging.getLogger(__name__)
@@ -38,12 +38,12 @@ class GeminiProvider(LLMProvider):
 
         genai.configure(api_key=self._api_key)
 
-        diagnosis_json = diagnosis.model_dump_json(indent=2)
+        summary = build_compact_summary(diagnosis)
         prompt = f"""{SYSTEM_PROMPT}
 
 ---
 
-{build_user_prompt(diagnosis_json)}"""
+{build_user_prompt(summary)}"""
 
         try:
             model = genai.GenerativeModel(self._model)

@@ -3,7 +3,7 @@
 import logging
 
 from .base import LLMProvider
-from .prompts import SYSTEM_PROMPT, build_user_prompt
+from .prompts import SYSTEM_PROMPT, build_user_prompt, build_compact_summary
 from ..utils.exceptions import LLMAuthError, LLMTimeoutError, LLMRateLimitError
 
 logger = logging.getLogger(__name__)
@@ -39,14 +39,14 @@ class OpenAIProvider(LLMProvider):
 
         client = openai.OpenAI(**client_kwargs)
 
-        diagnosis_json = diagnosis.model_dump_json(indent=2)
+        summary = build_compact_summary(diagnosis)
 
         try:
             response = client.chat.completions.create(
                 model=self._model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": build_user_prompt(diagnosis_json)},
+                    {"role": "user", "content": build_user_prompt(summary)},
                 ],
                 max_tokens=2048,
                 timeout=LLM_TIMEOUT_SECONDS,
